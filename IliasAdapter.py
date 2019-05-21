@@ -116,6 +116,7 @@ def upload(ubID, stud,f):
     r = post(url, files=files, data={'cmd[uploadFile]': 'Hochladen'})
 
 def getStudentsOverView(f=file('data', 'ilias-overview.csv')):
+    print('Collecting Student-Data from Ilias')
     with open(f, 'w') as f:
         f.write('iliasID,Nachname,Vorname,uID\n')
         r = get(overviewurl)

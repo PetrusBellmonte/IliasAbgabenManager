@@ -83,6 +83,7 @@ def backUp():
                 handle.write(chunk)
 
 def getStudentsOverView(f= file('data','math-overview.csv')):
+    print('Collecting Student-Data from Grade-Portal')
     prep(overviewUrl)
     data = {
         'lname': 'on',

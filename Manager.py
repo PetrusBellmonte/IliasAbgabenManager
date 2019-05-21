@@ -1,12 +1,25 @@
 from FileHandling import *
 import IliasAdapter, MaAdapter
-import StudentData as studData
 import os, json, shutil
 
 command = ''
 
 FINISHED = 'finished'
 PROGRESS = 'progress'
+
+if not exist(file('workplace')):
+    os.mkdir(file('workplace'))
+if not exist(file('data')):
+    os.mkdir(file('data'))
+if not exist(file('data', 'downloads')):
+    os.mkdir(file('data', 'downloads'))
+if not exist(file('data', 'ilias-overview.csv')):
+    IliasAdapter.getStudentsOverView()
+if not exist(file('data', 'math-overview.csv')):
+    MaAdapter.getStudentsOverView()
+
+import StudentData as studData
+
 
 def load(ubID, stud):
     print('Loading Task %s by %s %s (%s)' % (ubID, stud['Vorname'], stud['Nachname'], stud['iliasID']))
@@ -85,11 +98,8 @@ while True:
                 fn = ubFolder(u[0])
                 if not exist(fn):
                     os.mkdir(fn)
-                print(fn)
-                print(fn.split(os.pathsep)[-1].split('-'))
                 if len(fn.split(os.pathsep)[-1].split('-'))==2:
                     #TODO Teilt vor data
-                    print('rename',fn,joinPath(*fn.split(os.pathsep)[:-1],fn.split(os.pathsep)[-1].replace('-','-'+u[1]+'-')))
                     os.rename(fn,joinPath(*fn.split(os.pathsep)[:-1],fn.split(os.pathsep)[-1].replace('-','-'+u[1]+'-')))
                 pass
         ubs = getUbungen()
@@ -117,7 +127,6 @@ while True:
             print('No Task with this ID %s. Download it first with "getTask %s -r"' % (ubID, ubID))
         else:
             teams_list = ['MatrNr', 'Status', 'Last name', 'u-ID']
-            print(getStuds(ubID))
             data = [[s['Matrikelnummer'] if 'Matrikelnummer' in s.keys() else 'unknown', s['status'],
                      s['Nachname'], s['uID']] for s in getStuds(ubID)]
             row_format = "{:>15}" * (len(teams_list))
