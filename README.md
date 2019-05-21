@@ -27,3 +27,14 @@ Commands:
 - "backUpGrades" lad ein backup der Punkte runter, für den Fall, dass was schief laufen sollte
 
 Weiter Funktionen existieren schon und kommen noch und werden wenn mal Zeit ist auber erklärt und weiter implementiert
+
+Gewöhnlicher Ablauf:
+listTasks -r (Es listet die vorhandenen Übungsblätter auf)
+getTask 27497 -r (Alle Abgaben zu Blatt 4 werden heruntergeladen)
+listSubmits 27497 (Alle, die Abgegeben haben werden aufgelistet)
+reduce 27497 -w uzuse,ufjed,ufldf (Alle abgaben, bis auf diese 3 werden gelöscht)
+listSubmits 27497 (Listet jezt nur noch die gewünschten Abgaben auf)
+fetch 27497 (Läd die erst Abgabe. Diese wird bearbeitet UND GESPEICHERT)
+next 3.5 4 (Letzte Abgabe wird mit 3.5 und 4Punkten bewertet und weg-gespeichert. Eine neue Abgabe wird automatisch geladen)
+next 5.5 6 (usw bis eine Meldung kommt, dass alle Abgaben bearbeitet sind.)
+push 27497 4 (Läd alles hoch und trägt die Punkte für Blatt 4 ein)
