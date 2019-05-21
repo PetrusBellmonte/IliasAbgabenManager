@@ -2,3 +2,5 @@ config
 venv/*
 data/*
 .idea
+
+!data/downloads/.gitkeep
