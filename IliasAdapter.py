@@ -6,7 +6,7 @@ from FileHandling import file, unzip, studFolder, joinPath,ubFolder
 
 helpurl = "https://ilias.studium.kit.edu/templates/default/images/icon_exc.svg"
 baseurl = "https://ilias.studium.kit.edu/"
-feedbackurl = lambda ubID, stud: 'https://ilias.studium.kit.edu/ilias.php?ref_id=948986&ass_id=%s&vw=1&member_id=%s&cmd=listFiles&cmdClass=ilfilesystemgui&cmdNode=11k:11g:10w:jd&baseClass=ilExerciseHandlerGUI' % (ubID, stud['iliasID'])
+feedbackurl = lambda ubID, stud: 'https://ilias.studium.kit.edu/ilias.php?ref_id=948986&ass_id=%s&vw=1&member_id=%s&cmd=listFiles&cmdClass=ilfilesystemgui&cmdNode=11k:11g:1:pr&baseClass=ilExerciseHandlerGUI' % (ubID, stud['iliasID'])
 desktop = 'https://ilias.studium.kit.edu/ilias.php?baseClass=ilPersonalDesktopGUI&cmd=jumpToSelectedItems'
 overviewurl = 'https://ilias.studium.kit.edu/ilias.php?ref_id=948986&cmd=members&cmdClass=ilexercisemanagementgui&cmdNode=11k:11g:1&baseClass=ilExerciseHandlerGUI'
 #overviewurl = "https://ilias.studium.kit.edu/ilias.php?ref_id=948986&vw=1&exc_mem_trows=800&cmd=members&cmdClass=ilexercisemanagementgui&cmdNode=11k:11g:10w&baseClass=ilExerciseHandlerGUI"
