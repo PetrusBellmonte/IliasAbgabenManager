@@ -1,8 +1,8 @@
 import html, os
 
-import SccSessions as Login
+import SccSessions
 import Config
-from FileHandling import file, unzip, studFolder, joinPath,ubFolder
+from FileHandling import *
 
 helpurl = "https://ilias.studium.kit.edu/templates/default/images/icon_exc.svg"
 baseurl = "https://ilias.studium.kit.edu/"
@@ -16,20 +16,20 @@ loginurl = "https://ilias.studium.kit.edu/login.php?target=&client_id=produktiv&
 def post(url, *args, **kvargs):
     i = Config.get('tries',3)
     while i >= 0:
-        r = Login.iliasS.post(url, *args, **kvargs)
+        r = SccSessions.post(url, *args, **kvargs)
         if not 'reloadpublic' in r.url:
             return r
-        Login.getIliasSession()
+        SccSessions.getIliasSession()
         i -= 1
 
 
-def get(url, *args, **kvargs):
+def get(url, **kvargs):
     i = Config.get('tries',3)
     while i >= 0:
-        r = Login.iliasS.get(url, *args, **kvargs)
+        r = SccSessions.get(url, **kvargs)
         if not 'reloadpublic' in r.url:
             return r
-        Login.getIliasSession()
+        SccSessions.getIliasSession()
         i -= 1
 
 

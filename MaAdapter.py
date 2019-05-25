@@ -1,4 +1,4 @@
-import SccSessions as Login
+import SccSessions
 from FileHandling import file
 import datetime
 
@@ -13,19 +13,19 @@ overviewUrl = 'https://ma-vv.math.kit.edu/sso/overview'
 def post(url, *args, **kvargs):
     i= Config.get('tries',3)
     while i >=0:
-        r = Login.maS.post(url,*args, **kvargs)
+        r = SccSessions.post(url, *args, **kvargs)
         if not 'idp.scc.kit.edu' in r.url:
             return r
-        Login.getMASession()
+        SccSessions.getMASession()
         i -= 1
 
 def get(url, *args, **kvargs):
     i= Config.get('tries',3)
     while i >=0:
-        r = Login.maS.get(url,*args, **kvargs)
+        r = SccSessions.get(url, *args, **kvargs)
         if not 'idp.scc.kit.edu' in r.url:
             return r
-        Login.getMASession()
+        SccSessions.getMASession()
         i -= 1
 
 def setBlatt(nr,matr, points):
