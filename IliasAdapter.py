@@ -9,7 +9,8 @@ baseurl = "https://ilias.studium.kit.edu/"
 feedbackurl = lambda ubID, stud: 'https://ilias.studium.kit.edu/ilias.php?ref_id=$%s&ass_id=%s&vw=1&member_id=%s&cmd=listFiles&cmdClass=ilfilesystemgui&cmdNode=11k:11g:1:pr&baseClass=ilExerciseHandlerGUI' \
                                  % (Config.get('course'),ubID, stud['iliasID'])
 desktop = 'https://ilias.studium.kit.edu/ilias.php?baseClass=ilPersonalDesktopGUI&cmd=jumpToSelectedItems'
-overviewurl = 'https://ilias.studium.kit.edu/ilias.php?ref_id=%s&vw=1&exc_mem_trows=800&cmd=members&cmdClass=ilexercisemanagementgui&cmdNode=11k:11g:1&baseClass=ilExerciseHandlerGUI' % Config.get('course')
+courseurl = 'https://ilias.studium.kit.edu/ilias.php?baseClass=ilExerciseHandlerGUI&ref_id=%s&cmd=showOverview' % Config.get('course')
+listurl = 'https://ilias.studium.kit.edu/ilias.php?ref_id=%s&vw=1&exc_mem_trows=800&cmd=members&cmdClass=ilexercisemanagementgui&cmdNode=11k:11g:1&baseClass=ilExerciseHandlerGUI' % Config.get('course')
 loginurl = "https://ilias.studium.kit.edu/login.php?target=&client_id=produktiv&cmd=force_login&lang=de"
 downloadurl = lambda ubID, stud:'https://ilias.studium.kit.edu/ilias.php?ref_id=%s&vw=1&member_id=%s&ass_id=%s&cmd=downloadReturned&cmdClass=ilexsubmissionfilegui&cmdNode=11k:11g:10w:10q&baseClass=ilExerciseHandlerGUI' \
                                 % (Config.get('course'),str(stud['iliasID']), ubID)
@@ -33,10 +34,24 @@ def get(url, **kvargs):
         SccSessions.getIliasSession()
         i -= 1
 
+#This url sometimes changes...
+def getList(**kwargs):
+    global listurl
+    i = Config.get('tries', 3)
+    while i >= 0:
+        r = SccSessions.get(listurl, *kwargs)
+        if not 'error.php' in r.url:
+            return r
+        r = SccSessions.get(courseurl)
+        content = r.text
+        content = content[content.index('id="tab_grades"'):]
+        content = content[content.index('href="'):]
+        listurl = baseurl + html.unescape(content[i:content.index('"', i + 1)])
+        i -= 1
 
 def getBlätter():
     asss = []
-    r = post(overviewurl)
+    r = getList()
     content = r.text
     i = content.index('id="ass_id"')
     content = content[i:content.index("</select>", i)]
@@ -49,7 +64,7 @@ def getBlätter():
     return asss
 
 def downloadAllesBlatt(ubID):
-    r = get(overviewurl)
+    r = getList()
     datadic = {'ass_id': int(ubID), 'cmd[downloadAll]': 'Alle Abgaben herunterladen', 'user_login': ''}
     content = r.text
     i = content.index('id="ilToolbar"')
@@ -113,7 +128,7 @@ def getStudentsOverView(f=file('data', 'ilias-overview.csv')):
     print('Collecting Student-Data from Ilias')
     with open(f, 'w') as f:
         f.write('iliasID,Nachname,Vorname,uID\n')
-        r = get(overviewurl)
+        r = getList()
         cont = r.text
         while 'tblrow' in cont:
             cont = cont[cont.index('tblrow'):]
