@@ -1,15 +1,18 @@
 import requests, html
-import Config as conf
+import Config
 
 maS = requests.Session()
 def getMASession():
+    if not(Config.hasKey('username') and Config.hasKey('password')):
+        print('Config has no entry "username" or "password"')
+        return
     global maS
     r = maS.get('https://ma-vv.math.kit.edu/sso/overview')
     if not 'idp.scc.kit.edu' in r.url:
         print('Already Logged in by default????')
         return maS
     print('Login to MA-Portal')
-    data = {'j_username':conf.username,'j_password':conf.password,'_eventId_proceed':''}
+    data = {'j_username':Config.get('username'), 'j_password':Config.get('password'), '_eventId_proceed': ''}
     r = maS.post(r.url,data=data)
     data = {}
     cont = r.text
@@ -43,7 +46,7 @@ def getIliasSession():
         cont = cont[cont.index('value="')+len('value="'):]
         data[n] = html.unescape(cont[:cont.index('"')])
     r = iliasS.post(u, data=data)
-    data = {'j_username':conf.username,'j_password':conf.password,'_eventId_proceed':''}
+    data = {'j_username':Config.get('username'), 'j_password':Config.get('password'), '_eventId_proceed': ''}
     r = iliasS.post(r.url,data=data)
     data = {}
     cont = r.text

@@ -3,7 +3,7 @@ from FileHandling import file
 import datetime
 
 #hunchentoot-session=784:D99DA311991F50963AE2FFEE1AE28C6C; _shibsession_64656661756c7468747470733a2f2f6d612d76762e6d6174682e6b69742e6564752f7370=_64ec599487d49fccb780a8526148c0d6
-import Config as conf
+import Config
 MAurl = 'https://ma-vv.math.kit.edu/sso/administrate-exercises'
 indexUrl ='https://ma-vv.math.kit.edu/sso/index.html'
 selectUrl = 'https://ma-vv.math.kit.edu/sso/select'
@@ -11,7 +11,7 @@ statusUrl = 'https://ma-vv.math.kit.edu/sso/tutor-status'
 overviewUrl = 'https://ma-vv.math.kit.edu/sso/overview'
 
 def post(url, *args, **kvargs):
-    i= conf.conf['tries']
+    i= Config.get('tries',3)
     while i >=0:
         r = Login.maS.post(url,*args, **kvargs)
         if not 'idp.scc.kit.edu' in r.url:
@@ -20,7 +20,7 @@ def post(url, *args, **kvargs):
         i -= 1
 
 def get(url, *args, **kvargs):
-    i= conf.conf['tries']
+    i= Config.get('tries',3)
     while i >=0:
         r = Login.maS.get(url,*args, **kvargs)
         if not 'idp.scc.kit.edu' in r.url:
