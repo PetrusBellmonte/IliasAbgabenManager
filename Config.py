@@ -15,7 +15,6 @@ def save():
     with open(file('config'), 'w') as f:
         f.write(json.dumps(__conf))
 
-
 reload()
 
 

@@ -25,12 +25,13 @@ def load(ubID, stud):
     print('Loading Task %s by %s %s (%s)' % (ubID, stud['Vorname'], stud['Nachname'], stud['iliasID']))
     homef = studFolder(ubID, stud)
     stfiles = [f for f in listDirWithFile(homef) if not f[0].endswith('points')]
-    if any(f[0].split('.')[-2]==FINISHED for f in stfiles):
-        stfiles = [f for f in stfiles if f[0].split('.')[-2]==FINISHED]
-    elif any(f[0].split('.')[-2]==PROGRESS for f in stfiles):
-        stfiles = [f for f in stfiles if f[0].split('.')[-2]==PROGRESS]
+    if any(f[0].split('.')[-2] == FINISHED for f in stfiles):
+        stfiles = [f for f in stfiles if f[0].split('.')[-2] == FINISHED]
+    elif any(f[0].split('.')[-2] == PROGRESS for f in stfiles):
+        stfiles = [f for f in stfiles if f[0].split('.')[-2] == PROGRESS]
     for fn, f in stfiles:
-        shutil.copy(f, file('workplace', progFile(fn.replace('.'+FINISHED, '').replace('.'+PROGRESS, ''), ubID, stud)))
+        shutil.copy(f,
+                    file('workplace', progFile(fn.replace('.' + FINISHED, '').replace('.' + PROGRESS, ''), ubID, stud)))
 
 
 def unload(ubID, stud, status):
@@ -38,7 +39,7 @@ def unload(ubID, stud, status):
     for fn, f in listDirWithFile(file('workplace')):
         sp = fn.split('.')
         if sp[-3] == ubID and sp[-2] == stud['iliasID']:
-            shutil.copy(f, joinPath(studFolder(ubID, stud), ''.join(sp[:-5])+ '.' + status + '.' + sp[-1] ))
+            shutil.copy(f, joinPath(studFolder(ubID, stud), ''.join(sp[:-5]) + '.' + status + '.' + sp[-1]))
             rmFile(f)
             success = True
     if not success:
@@ -65,25 +66,30 @@ def nextStud(ubID):
     print('Everything is already finished.')
     return
 
+
 def savepoints(ubID, stud, points):
     folder = studFolder(ubID, stud)
     with open(joinPath(folder, '.points'), 'w') as f:
         f.write(json.dumps(points))
 
+
 def getUbungen():
     ubs = []
     for f, d in listDirWithFile(file('data')):
         if f.startswith('ubungen'):
-            ubs.append({'ubID':f.split('-')[-1],'name':(f.split('-')[-2] if f.count('-')>1 else 'unknown')})
+            ubs.append({'ubID': f.split('-')[-1], 'name': (f.split('-')[-2] if f.count('-') > 1 else 'unknown')})
     return ubs
+
 
 def getStuds(ubID):
     studs = []
     for d in listDir(ubFolder(ubID)):
         if not any([f.split('.')[-2] == FINISHED for f in listDir(d)]):
-            stts = 'f' if any([f.split('.')[-2] == FINISHED for f in listDir(d)]) else 'p' if any([f.split('.')[-2] == PROGRESS for f in listDir(d)]) else '-'
-            studs.append({**studData.byIliasID[folderStud(d)['iliasID']], 'status':stts})
+            stts = 'f' if any([f.split('.')[-2] == FINISHED for f in listDir(d)]) else 'p' if any(
+                [f.split('.')[-2] == PROGRESS for f in listDir(d)]) else '-'
+            studs.append({**studData.byIliasID[folderStud(d)['iliasID']], 'status': stts})
     return studs
+
 
 print('Ready!')
 while True:
@@ -98,9 +104,10 @@ while True:
                 fn = ubFolder(u[0])
                 if not exist(fn):
                     os.mkdir(fn)
-                if len(fn.split(os.pathsep)[-1].split('-'))==2:
-                    #TODO Teilt vor data
-                    os.rename(fn,joinPath(*fn.split(os.pathsep)[:-1],fn.split(os.pathsep)[-1].replace('-','-'+u[1]+'-')))
+                if len(fn.split(os.pathsep)[-1].split('-')) == 2:
+                    # TODO Teilt vor data
+                    os.rename(fn, joinPath(*fn.split(os.pathsep)[:-1],
+                                           fn.split(os.pathsep)[-1].replace('-', '-' + u[1] + '-')))
                 pass
         ubs = getUbungen()
         if len(ubs) == 0:
@@ -110,16 +117,15 @@ while True:
             for u in ubs:
                 print(str(u['ubID']) + '\t' + u['name'])
 
-    if command.startswith('getTask '):  # getTask <id> -y -r
+    if command.startswith('getTask '):  # getTask <id> -y
         ubID = command.split(' ')[1]
         y = '-y' in command or '--yes' in command
         answer = ''
-        if not exist(ubFolder(ubID)) or '-r' in command or '--redownload' in command:
-            if not y:
-                print('Should it be downloaded? [y/n] ', end='')
-                answer = input()
-            if answer.lower() == 'y' or y:
-                IliasAdapter.downloadAllesBlatt(ubID)
+        if not y:
+            print('Should it be downloaded? [y/n] ', end='')
+            answer = input()
+        if answer.lower() == 'y' or y:
+            IliasAdapter.downloadAllesBlatt(ubID)
 
     if command.startswith('listSubmits '):  # list <ubID>
         ubID = command.split(' ')[1]
@@ -137,7 +143,7 @@ while True:
     if command.startswith('reduce '):  # reduce <ubID> -w/-b
         ubID = command.split(' ')[1]
         if not exist(ubFolder(ubID)):
-            print('No Task with id',ubID)
+            print('No Task with id', ubID)
             continue
         if ' -w ' in command:
             args = command.split(' ')
@@ -153,7 +159,7 @@ while True:
                     rmFile(f)
         print('Done')
 
-    if command.startswith('fetch '):  #fetch <ubID> <?iliasID/u-ID>
+    if command.startswith('fetch '):  # fetch <ubID> <?iliasID/u-ID>
         ubID = command.split(' ')[1]
         if command.count(' ') >= 2:
             sid = command.split(' ')[2]
@@ -181,11 +187,11 @@ while True:
                 print('Shelved %s by %s' % (ubID, iliasID))
         else:
             if len(command.split(' ')) < 3:
-                print('Please specify Task and Studend: "shelve <taskID> <student-iliasID>"')
+                print('Please specify Task and Studend: "shelve <taskID> <u-ID>"')
             ubID = command.split(' ')[1]
-            iliasID = command.split(' ')[2]
-            unload(ubID, studData.byIliasID[iliasID], PROGRESS)
-            print('Shelved %s by %s' % (ubID, iliasID))
+            uID = command.split(' ')[2]
+            unload(ubID, studData.byUID[uID], PROGRESS)
+            print('Shelved %s by %s' % (ubID, uID))
 
     if command.startswith('commit'):  ######################### DO NOT CHANGE THIS METHOD!!!!!!!!!!!!!!!!
         if command.strip() == 'commit':
@@ -200,11 +206,11 @@ while True:
                 print('Committed %s by %s' % (ubID, iliasID))
         else:
             if len(command.split(' ')) < 3:
-                print('Please specify Task and student: "commit <taskID> <student-iliasID>"')
+                print('Please specify Task and student: "commit <taskID> <u-ID>"')
             ubID = command.split(' ')[1]
-            iliasID = command.split(' ')[2]
-            unload(ubID, studData.byIliasID[iliasID], FINISHED)
-            print('Committed %s by %s' % (ubID, iliasID))
+            uID = command.split(' ')[2]
+            unload(ubID, studData.byUID[uID], FINISHED)
+            print('Committed %s by %s' % (ubID, uID))
 
     if command.startswith('next'):
         ubID, iliasID = onlyOneLoaded()
@@ -222,24 +228,41 @@ while True:
     if command.startswith('points'):
         ubID, iliasID = onlyOneLoaded()
         if ubID is None:
+            print('There can only be one persons files in the workplace-folder to use this command!')
             continue
         points = [e for e in command.split(' ')[1:]]
         savepoints(ubID, studData.byIliasID[iliasID], points)
         print('Points saved')
 
     if command.startswith('push'):  # push <ubID> <nr>
-        if not command.count(' ') == 2:
+        if ' ' not in command:
             print('Incorrect command-format: "push <Task-ID> <Number>"');
             continue
         ubID = command.split(' ')[1]
-        nr = command.split(' ')[2]
+        y = '-y' in command or '--yes' in command
+
+        if command.count(' ') == 2:
+            nr = command.split(' ')[2]
+        else:
+            nr = ubFolder(ubID).split('-')[-2]
+            if nr =='ubungen':
+                print('Incorrect command-format: "push <Task-ID> <Number>"');
+                continue
+            answer = ''
+            if not y:
+                print('Should \"'+nr+'\" be the task-number? [y/n] ', end='')
+                answer = input()
+            if not answer.lower() == 'y' and not y:
+                print('Incorrect command-format: "push <Task-ID> <Number>"');
+                continue
+
         results = []
         for f in [fo for fo in listDir(ubFolder(ubID)) if
-                  any(f2.split('.')[-2]==FINISHED for f2 in os.listdir(fo)) or exist(joinPath(fo, '.points'))]:
+                  any(f2.split('.')[-2] == FINISHED for f2 in os.listdir(fo)) or exist(joinPath(fo, '.points'))]:
             stud = studData.byIliasID[f.split('_')[-1]]
             if not any('-feedback.' in f3 for f3 in os.listdir(f)):
-                for ff in [f3 for f3 in listDir(f) if f3.split('.')[-2]==FINISHED]:
-                    parts = ff.replace('.'+FINISHED, '').split('.')
+                for ff in [f3 for f3 in listDir(f) if f3.split('.')[-2] == FINISHED]:
+                    parts = ff.replace('.' + FINISHED, '').split('.')
                     ufn = '.'.join(parts[:-1]) + '-feedback.' + parts[-1]
                     shutil.copy(ff, ufn)
                     IliasAdapter.upload(ubID, stud, ufn)
