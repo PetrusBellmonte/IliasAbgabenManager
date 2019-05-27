@@ -48,12 +48,12 @@ for e in iliasData:
         mathData.append(e)
 
 
-mathNachname = {e['Nachname']:e for e in mathData}
-mathVorname = {e['Vorname']:e for e in mathData}
-mathUID = {e['uID']:e for e in mathData if 'uID' in e.keys()}
-mathIliasID = {e['iliasID']:e for e in mathData if 'iliasID' in e.keys()}
-mathMatrikelnummer = {e['Matrikelnummer']:e for e in mathData if 'Matrikelnummer' in e.keys()}
-mathTut = {e['Tut']:e for e in mathData if 'Tut' in e.keys()}
+byNachname = {e['Nachname']:e for e in mathData}
+byVorname = {e['Vorname']:e for e in mathData}
+byUID = {e['uID']:e for e in mathData if 'uID' in e.keys()}
+byIliasID = {e['iliasID']:e for e in mathData if 'iliasID' in e.keys()}
+byMatrikelnummer = {e['Matrikelnummer']:e for e in mathData if 'Matrikelnummer' in e.keys()}
+byTut = {e['Tut']:e for e in mathData if 'Tut' in e.keys()}
 #print(mathData)
 #print(mathIliasID)
 del(mathData)

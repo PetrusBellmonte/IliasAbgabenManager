@@ -4,6 +4,13 @@ file = lambda *path: os.path.join(os.path.dirname(os.path.abspath(__file__)), *p
 joinPath = lambda *s: os.path.join(*s)
 exist = lambda f: os.path.exists(f)
 
+def isEmpty(f):
+    for f2 in os.listdir(f):
+        print(f2)
+        return False
+    return True
+
+
 def ubFolder(ubID):
     for f in os.listdir(file('data')):
         if f.endswith(ubID):

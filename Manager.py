@@ -61,7 +61,7 @@ def onlyOneLoaded():
 def nextStud(ubID):
     for d in listDir(ubFolder(ubID)):
         if not any([f.split('.')[-2] == FINISHED for f in listDir(d)]):
-            return studData.mathIliasID[folderStud(d)['iliasID']]
+            return studData.byIliasID[folderStud(d)['iliasID']]
     print('Everything is already finished.')
     return
 
@@ -82,7 +82,7 @@ def getStuds(ubID):
     for d in listDir(ubFolder(ubID)):
         if not any([f.split('.')[-2] == FINISHED for f in listDir(d)]):
             stts = 'f' if any([f.split('.')[-2] == FINISHED for f in listDir(d)]) else 'p' if any([f.split('.')[-2] == PROGRESS for f in listDir(d)]) else '-'
-            studs.append({**studData.mathIliasID[folderStud(d)['iliasID']],'status':stts})
+            studs.append({**studData.byIliasID[folderStud(d)['iliasID']], 'status':stts})
     return studs
 
 print('Ready!')
@@ -123,7 +123,7 @@ while True:
 
     if command.startswith('listSubmits '):  # list <ubID>
         ubID = command.split(' ')[1]
-        if not exist(ubFolder(ubID)):
+        if not exist(ubFolder(ubID)) or isEmpty(ubFolder(ubID)):
             print('No Task with this ID %s. Download it first with "getTask %s -r"' % (ubID, ubID))
         else:
             teams_list = ['MatrNr', 'Status', 'Last name', 'u-ID']
@@ -136,6 +136,9 @@ while True:
 
     if command.startswith('reduce '):  # reduce <ubID> -w/-b
         ubID = command.split(' ')[1]
+        if not exist(ubFolder(ubID)):
+            print('No Task with id',ubID)
+            continue
         if ' -w ' in command:
             args = command.split(' ')
             l = args[args.index('-w') + 1].split(',')
@@ -150,14 +153,14 @@ while True:
                     rmFile(f)
         print('Done')
 
-    if command.startswith('fetch '):  # workon <ubID> <?iliasID/u-ID>
+    if command.startswith('fetch '):  #fetch <ubID> <?iliasID/u-ID>
         ubID = command.split(' ')[1]
         if command.count(' ') >= 2:
             sid = command.split(' ')[2]
             if sid[0] == 'u' or sid[0] == 't':
-                std = studData.mathUID[sid]
+                std = studData.byUID[sid]
             else:
-                std = studData.mathIliasID[sid]
+                std = studData.byIliasID[sid]
         else:
             std = nextStud(ubID)
             if std is None:
@@ -169,48 +172,48 @@ while True:
             ubID, iliasID = onlyOneLoaded()
             print(ubID, iliasID)
             if not ubID is None:
-                unload(ubID, studData.mathIliasID[iliasID], PROGRESS)
+                unload(ubID, studData.byIliasID[iliasID], PROGRESS)
                 print('Shelved %s by %s' % (ubID, iliasID))
         elif '-a' in command or '--all' in command:
             tbr = set(tuple(f.split('.')[-3:-2]) for f in listDir(file('workplace')))
             for ubID, iliasID in tbr:
-                unload(ubID, studData.mathIliasID[iliasID], PROGRESS)
+                unload(ubID, studData.byIliasID[iliasID], PROGRESS)
                 print('Shelved %s by %s' % (ubID, iliasID))
         else:
             if len(command.split(' ')) < 3:
                 print('Please specify Task and Studend: "shelve <taskID> <student-iliasID>"')
             ubID = command.split(' ')[1]
             iliasID = command.split(' ')[2]
-            unload(ubID, studData.mathIliasID[iliasID], PROGRESS)
+            unload(ubID, studData.byIliasID[iliasID], PROGRESS)
             print('Shelved %s by %s' % (ubID, iliasID))
 
-    if command.startswith('commit'):  ######################### TO NOT CHANGE THIS METHOD!!!!!!!!!!!!!!!!
+    if command.startswith('commit'):  ######################### DO NOT CHANGE THIS METHOD!!!!!!!!!!!!!!!!
         if command.strip() == 'commit':
             ubID, iliasID = onlyOneLoaded()
             if not ubID is None:
-                unload(ubID, studData.mathIliasID[iliasID], FINISHED)
+                unload(ubID, studData.byIliasID[iliasID], FINISHED)
                 print('Committed %s by %s' % (ubID, iliasID))
         elif '-a' in command or '--all' in command:
             tbr = set(tuple(f.split('.')[-3:-2]) for f in listDir(file('workplace')))
             for ubID, iliasID in tbr:
-                unload(ubID, studData.mathIliasID[iliasID], FINISHED)
+                unload(ubID, studData.byIliasID[iliasID], FINISHED)
                 print('Committed %s by %s' % (ubID, iliasID))
         else:
             if len(command.split(' ')) < 3:
-                print('Please specify Task and Studend: "commit <taskID> <student-iliasID>"')
+                print('Please specify Task and student: "commit <taskID> <student-iliasID>"')
             ubID = command.split(' ')[1]
             iliasID = command.split(' ')[2]
-            unload(ubID, studData.mathIliasID[iliasID], FINISHED)
+            unload(ubID, studData.byIliasID[iliasID], FINISHED)
             print('Committed %s by %s' % (ubID, iliasID))
 
     if command.startswith('next'):
         ubID, iliasID = onlyOneLoaded()
         if ubID is None:
             continue
-        unload(ubID, studData.mathIliasID[iliasID], FINISHED)
+        unload(ubID, studData.byIliasID[iliasID], FINISHED)
         if len(command.split(' ')) > 1:
             points = [e for e in command.split(' ')[1:]]
-            savepoints(ubID, studData.mathIliasID[iliasID], points)
+            savepoints(ubID, studData.byIliasID[iliasID], points)
         std = nextStud(ubID)
         if std is None:
             continue
@@ -221,7 +224,7 @@ while True:
         if ubID is None:
             continue
         points = [e for e in command.split(' ')[1:]]
-        savepoints(ubID, studData.mathIliasID[iliasID], points)
+        savepoints(ubID, studData.byIliasID[iliasID], points)
         print('Points saved')
 
     if command.startswith('push'):  # push <ubID> <nr>
@@ -233,7 +236,7 @@ while True:
         results = []
         for f in [fo for fo in listDir(ubFolder(ubID)) if
                   any(f2.split('.')[-2]==FINISHED for f2 in os.listdir(fo)) or exist(joinPath(fo, '.points'))]:
-            stud = studData.mathIliasID[f.split('_')[-1]]
+            stud = studData.byIliasID[f.split('_')[-1]]
             if not any('-feedback.' in f3 for f3 in os.listdir(f)):
                 for ff in [f3 for f3 in listDir(f) if f3.split('.')[-2]==FINISHED]:
                     parts = ff.replace('.'+FINISHED, '').split('.')

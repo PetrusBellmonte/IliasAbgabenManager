@@ -6,7 +6,7 @@ from FileHandling import *
 
 helpurl = "https://ilias.studium.kit.edu/templates/default/images/icon_exc.svg"
 baseurl = "https://ilias.studium.kit.edu/"
-feedbackurl = lambda ubID, stud: 'https://ilias.studium.kit.edu/ilias.php?ref_id=$%s&ass_id=%s&vw=1&member_id=%s&cmd=listFiles&cmdClass=ilfilesystemgui&cmdNode=11k:11g:1:pr&baseClass=ilExerciseHandlerGUI' \
+feedbackurl = lambda ubID, stud: 'https://ilias.studium.kit.edu/ilias.php?ref_id=$%s&ass_id=%s&vw=1&member_id=%s&cmd=listFiles&cmdClass=ilfilesystemgui&cmdNode=11k:11g:1f:pr&baseClass=ilExerciseHandlerGUI' \
                                  % (Config.get('course'),ubID, stud['iliasID'])
 desktop = 'https://ilias.studium.kit.edu/ilias.php?baseClass=ilPersonalDesktopGUI&cmd=jumpToSelectedItems'
 courseurl = 'https://ilias.studium.kit.edu/ilias.php?baseClass=ilExerciseHandlerGUI&ref_id=%s&cmd=showOverview' % Config.get('course')
@@ -15,20 +15,20 @@ loginurl = "https://ilias.studium.kit.edu/login.php?target=&client_id=produktiv&
 downloadurl = lambda ubID, stud:'https://ilias.studium.kit.edu/ilias.php?ref_id=%s&vw=1&member_id=%s&ass_id=%s&cmd=downloadReturned&cmdClass=ilexsubmissionfilegui&cmdNode=11k:11g:10w:10q&baseClass=ilExerciseHandlerGUI' \
                                 % (Config.get('course'),str(stud['iliasID']), ubID)
 
-def post(url, *args, **kvargs):
+def post(url, *args, **kwargs):
     i = Config.get('tries',3)
     while i >= 0:
-        r = SccSessions.post(url, *args, **kvargs)
+        r = SccSessions.post(url, *args, **kwargs)
         if not 'reloadpublic' in r.url:
             return r
         SccSessions.getIliasSession()
         i -= 1
 
 
-def get(url, **kvargs):
+def get(url, **kwargs):
     i = Config.get('tries',3)
     while i >= 0:
-        r = SccSessions.get(url, **kvargs)
+        r = SccSessions.get(url, **kwargs)
         if not 'reloadpublic' in r.url:
             return r
         SccSessions.getIliasSession()
@@ -39,10 +39,10 @@ def getList(**kwargs):
     global listurl
     i = Config.get('tries', 3)
     while i >= 0:
-        r = SccSessions.get(listurl, *kwargs)
+        r = get(listurl, **kwargs)
         if not 'error.php' in r.url:
             return r
-        r = SccSessions.get(courseurl)
+        r = get(courseurl)
         content = r.text
         content = content[content.index('id="tab_grades"'):]
         content = content[content.index('href="'):]
@@ -52,6 +52,7 @@ def getList(**kwargs):
 def getBlätter():
     asss = []
     r = getList()
+    print(r.url)
     content = r.text
     i = content.index('id="ass_id"')
     content = content[i:content.index("</select>", i)]
@@ -68,8 +69,8 @@ def downloadAllesBlatt(ubID):
     datadic = {'ass_id': int(ubID), 'cmd[downloadAll]': 'Alle Abgaben herunterladen', 'user_login': ''}
     content = r.text
     i = content.index('id="ilToolbar"')
-    i = content.index('action="', i + 1) + len('action="')
-    url = baseurl + html.unescape(content[i:content.index('"', i + 1)])
+    i = content.index('action="') + len('action="')
+    url = baseurl + html.unescape(content[i:content.index('"')])
     # r = post(url, stream=True, data=datadic)
     print('Requesting Data...', end='\r')
     r = post(url, stream=True, data=datadic)
