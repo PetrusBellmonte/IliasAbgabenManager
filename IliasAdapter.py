@@ -69,13 +69,12 @@ def downloadAllesBlatt(ubID):
     datadic = {'ass_id': int(ubID), 'cmd[downloadAll]': 'Alle Abgaben herunterladen', 'user_login': ''}
     content = r.text
     i = content.index('id="ilToolbar"')
-    i = content.index('action="') + len('action="')
-    url = baseurl + html.unescape(content[i:content.index('"')])
+    i = content.index('action="',i) + len('action="')
+    url = baseurl + html.unescape(content[i:content.index('"',i+1)+1])
     # r = post(url, stream=True, data=datadic)
     print('Requesting Data...', end='\r')
     r = post(url, stream=True, data=datadic)
     totalLen = int(r.headers.get('content-length'))
-    print('Receiving Data...')
     out = file('data', 'downloads', 'ubungen-' + ubID + '.zip')
     with open(out, 'wb') as handle:
         dl = 0
@@ -139,5 +138,3 @@ def getStudentsOverView(f=file('data', 'ilias-overview.csv')):
             line += html.unescape(cont[cont.index('>') + 1:cont.index('<')].replace(', ', ',').replace('\n', '').strip()) + ','
             cont = cont[cont.index('<td') + len('<td'):]
             f.write(line + html.unescape(cont[cont.index('>') + 1:cont.index('<')].strip()) + '\n')
-
-
