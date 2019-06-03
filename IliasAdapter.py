@@ -4,35 +4,62 @@ import SccSessions
 import Config
 from FileHandling import *
 
-helpurl = "https://ilias.studium.kit.edu/templates/default/images/icon_exc.svg"
-baseurl = "https://ilias.studium.kit.edu/"
-feedbackurl = lambda ubID, stud: 'https://ilias.studium.kit.edu/ilias.php?ref_id=$%s&ass_id=%s&vw=1&member_id=%s&cmd=listFiles&cmdClass=ilfilesystemgui&cmdNode=11k:11g:1f:pr&baseClass=ilExerciseHandlerGUI' \
-                                 % (Config.get('course'),ubID, stud['iliasID'])
-desktop = 'https://ilias.studium.kit.edu/ilias.php?baseClass=ilPersonalDesktopGUI&cmd=jumpToSelectedItems'
-courseurl = 'https://ilias.studium.kit.edu/ilias.php?baseClass=ilExerciseHandlerGUI&ref_id=%s&cmd=showOverview' % Config.get('course')
-listurl = 'https://ilias.studium.kit.edu/ilias.php?ref_id=%s&vw=1&exc_mem_trows=800&cmd=members&cmdClass=ilexercisemanagementgui&cmdNode=11k:11g:1&baseClass=ilExerciseHandlerGUI' % Config.get('course')
-loginurl = "https://ilias.studium.kit.edu/login.php?target=&client_id=produktiv&cmd=force_login&lang=de"
-downloadurl = lambda ubID, stud:'https://ilias.studium.kit.edu/ilias.php?ref_id=%s&vw=1&member_id=%s&ass_id=%s&cmd=downloadReturned&cmdClass=ilexsubmissionfilegui&cmdNode=11k:11g:10w:10q&baseClass=ilExerciseHandlerGUI' \
-                                % (Config.get('course'),str(stud['iliasID']), ubID)
+
 
 def post(url, *args, **kwargs):
     i = Config.get('tries',3)
     while i >= 0:
         r = SccSessions.post(url, *args, **kwargs)
-        if not 'reloadpublic' in r.url:
+        if 'reloadpublic' in r.url:
+            SccSessions.getIliasSession()
+        else:
             return r
-        SccSessions.getIliasSession()
         i -= 1
 
 
 def get(url, **kwargs):
+    print('get',url)
     i = Config.get('tries',3)
     while i >= 0:
         r = SccSessions.get(url, **kwargs)
-        if not 'reloadpublic' in r.url:
+        if 'reloadpublic' in r.url:
+            SccSessions.getIliasSession()
+        else:
             return r
-        SccSessions.getIliasSession()
         i -= 1
+
+
+#Build up urls
+helpurl = "https://ilias.studium.kit.edu/templates/default/images/icon_exc.svg"
+baseurl = "https://ilias.studium.kit.edu/"
+desktop = 'https://ilias.studium.kit.edu/ilias.php?baseClass=ilPersonalDesktopGUI&cmd=jumpToSelectedItems'
+loginurl = "https://ilias.studium.kit.edu/login.php?target=&client_id=produktiv&cmd=force_login&lang=de"
+courseurl = 'https://ilias.studium.kit.edu/ilias.php?baseClass=ilExerciseHandlerGUI&ref_id=%s&cmd=showOverview' % Config.get('course')
+
+
+def updateUrls():
+    global feedbackurl, courseurl,downloadurl, listurl
+    r = get(courseurl)
+    content = r.text
+    content = content[content.index('id="tab_grades"'):]
+    content = content[content.index('href="')+len('href="'):]
+    listurl = baseurl + html.unescape(content[:content.index('"', 1)])
+    r = get(listurl)
+    content = html.unescape(r.text)
+    content = content[content.index('cmd=listFiles'):]
+    #print(content)
+    content = content[content.index('&cmdNode='):]
+    cmdNodesuffix1 = content[:content.index('&',4)]
+    feedbackurl = lambda ubID, stud: 'https://ilias.studium.kit.edu/ilias.php?ref_id=%s&ass_id=%s&vw=1&member_id=%s&cmd=listFiles&cmdClass=ilfilesystemgui&baseClass=ilExerciseHandlerGUI' \
+                                     % (Config.get('course'),ubID, stud['iliasID']) + cmdNodesuffix1
+    content = content[content.index('cmd=downloadReturned'):]
+    content = content[content.index('&cmdNode='):]
+    cmdNodesuffix2 = content[:content.index('&',4)]
+    downloadurl = lambda ubID, stud:'https://ilias.studium.kit.edu/ilias.php?ref_id=%s&vw=1&member_id=%s&ass_id=%s&cmd=downloadReturned&cmdClass=ilexsubmissionfilegui&baseClass=ilExerciseHandlerGUI' \
+                                    % (Config.get('course'),str(stud['iliasID']), ubID) + cmdNodesuffix2
+
+updateUrls()
+
 
 #This url sometimes changes...
 def getList(**kwargs):
@@ -117,6 +144,7 @@ def downloadBlatt(ubID, stud):
 def upload(ubID, stud,f):
     print(' Upload %s by %s %s (%s) to Task %s'%(f.split(os.sep)[-1], stud['Vorname'], stud['Nachname'],stud['uID'], ubID))
     r = get(feedbackurl(ubID, stud))
+    print(r.url)
     cont = r.text
     cont = cont[cont.index('"ilToolbar"'):]
     cont = cont[cont.index('action="') + len('action="'):]
@@ -138,3 +166,7 @@ def getStudentsOverView(f=file('data', 'ilias-overview.csv')):
             line += html.unescape(cont[cont.index('>') + 1:cont.index('<')].replace(', ', ',').replace('\n', '').strip()) + ','
             cont = cont[cont.index('<td') + len('<td'):]
             f.write(line + html.unescape(cont[cont.index('>') + 1:cont.index('<')].strip()) + '\n')
+
+
+# https://ilias.studium.kit.edu/ilias.php?ref_id=948986&ass_id=27565&vw=1&member_id=1244891&cmd=listFiles&cmdClass=ilfilesystemgui&cmdNode=11k:11g:1&baseClass=ilExerciseHandlerGUI
+# https://ilias.studium.kit.edu/ilias.php?ref_id=948986&ass_id=26384&vw=1&member_id=1173296&cmd=listFiles&cmdClass=ilfilesystemgui&cmdNode=11k:11g:1:pr&baseClass=ilExerciseHandlerGUI
