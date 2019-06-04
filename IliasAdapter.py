@@ -1,4 +1,4 @@
-import html, os
+import html
 
 import SccSessions
 import Config

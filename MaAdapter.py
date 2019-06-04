@@ -1,9 +1,8 @@
-import SccSessions
+import SccSessions, Config
 from FileHandling import file
 import datetime
 
-#hunchentoot-session=784:D99DA311991F50963AE2FFEE1AE28C6C; _shibsession_64656661756c7468747470733a2f2f6d612d76762e6d6174682e6b69742e6564752f7370=_64ec599487d49fccb780a8526148c0d6
-import Config
+
 MAurl = 'https://ma-vv.math.kit.edu/sso/administrate-exercises'
 indexUrl ='https://ma-vv.math.kit.edu/sso/index.html'
 selectUrl = 'https://ma-vv.math.kit.edu/sso/select'
