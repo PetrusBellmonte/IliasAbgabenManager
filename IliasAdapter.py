@@ -58,6 +58,8 @@ def updateUrls():
     downloadurl = lambda ubID, stud:'https://ilias.studium.kit.edu/ilias.php?ref_id=%s&vw=1&member_id=%s&ass_id=%s&cmd=downloadReturned&cmdClass=ilexsubmissionfilegui&baseClass=ilExerciseHandlerGUI' \
                                     % (Config.get('course'),str(stud['iliasID']), ubID) + cmdNodesuffix2
 
+updateUrls()
+
 def getBlätter():
     asss = []
     r = get(listurl)
