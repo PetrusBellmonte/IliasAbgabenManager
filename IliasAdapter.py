@@ -12,18 +12,19 @@ def post(url, *args, **kwargs):
         r = SccSessions.post(url, *args, **kwargs)
         if 'reloadpublic' in r.url:
             SccSessions.getIliasSession()
+            updateUrls()
         else:
             return r
         i -= 1
 
 
 def get(url, **kwargs):
-    print('get',url)
     i = Config.get('tries',3)
     while i >= 0:
         r = SccSessions.get(url, **kwargs)
         if 'reloadpublic' in r.url:
             SccSessions.getIliasSession()
+            updateUrls()
         else:
             return r
         i -= 1
@@ -47,7 +48,6 @@ def updateUrls():
     r = get(listurl)
     content = html.unescape(r.text)
     content = content[content.index('cmd=listFiles'):]
-    #print(content)
     content = content[content.index('&cmdNode='):]
     cmdNodesuffix1 = content[:content.index('&',4)]
     feedbackurl = lambda ubID, stud: 'https://ilias.studium.kit.edu/ilias.php?ref_id=%s&ass_id=%s&vw=1&member_id=%s&cmd=listFiles&cmdClass=ilfilesystemgui&baseClass=ilExerciseHandlerGUI' \
@@ -57,8 +57,6 @@ def updateUrls():
     cmdNodesuffix2 = content[:content.index('&',4)]
     downloadurl = lambda ubID, stud:'https://ilias.studium.kit.edu/ilias.php?ref_id=%s&vw=1&member_id=%s&ass_id=%s&cmd=downloadReturned&cmdClass=ilexsubmissionfilegui&baseClass=ilExerciseHandlerGUI' \
                                     % (Config.get('course'),str(stud['iliasID']), ubID) + cmdNodesuffix2
-
-updateUrls()
 
 
 #This url sometimes changes...
@@ -79,7 +77,6 @@ def getList(**kwargs):
 def getBlätter():
     asss = []
     r = getList()
-    print(r.url)
     content = r.text
     i = content.index('id="ass_id"')
     content = content[i:content.index("</select>", i)]
@@ -144,7 +141,6 @@ def downloadBlatt(ubID, stud):
 def upload(ubID, stud,f):
     print(' Upload %s by %s %s (%s) to Task %s'%(f.split(os.sep)[-1], stud['Vorname'], stud['Nachname'],stud['uID'], ubID))
     r = get(feedbackurl(ubID, stud))
-    print(r.url)
     cont = r.text
     cont = cont[cont.index('"ilToolbar"'):]
     cont = cont[cont.index('action="') + len('action="'):]

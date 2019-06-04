@@ -12,8 +12,9 @@ def getMASession():
         print('Already Logged in by default????')
         return __session
     print('Login to MA-Portal')
-    data = {'j_username':Config.get('username'), 'j_password':Config.get('password'), '_eventId_proceed': ''}
-    r = __session.post(r.url,data=data)
+    if 'j_username' in r.text:
+        data = {'j_username':Config.get('username'), 'j_password':Config.get('password'), '_eventId_proceed': ''}
+        r = __session.post(r.url,data=data)
     data = {}
     cont = r.text
     cont = cont[cont.index('action="')+len('action="'):]
@@ -45,8 +46,9 @@ def getIliasSession():
         cont = cont[cont.index('value="')+len('value="'):]
         data[n] = html.unescape(cont[:cont.index('"')])
     r = __session.post(u, data=data)
-    data = {'j_username':Config.get('username'), 'j_password':Config.get('password'), '_eventId_proceed': ''}
-    r = __session.post(r.url,data=data)
+    if 'j_username' in r.text:
+        data = {'j_username':Config.get('username'), 'j_password':Config.get('password'), '_eventId_proceed': ''}
+        r = __session.post(r.url,data=data)
     data = {}
     cont = r.text
     cont = cont[cont.index('action="')+len('action="'):]
