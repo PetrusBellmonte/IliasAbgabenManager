@@ -265,7 +265,7 @@ while True:
                     parts = ff.replace('.' + FINISHED, '').split('.')
                     ufn = '.'.join(parts[:-1]) + '-feedback.' + parts[-1]
                     shutil.copy(ff, ufn)
-                    #IliasAdapter.upload(ubID, stud, ufn)
+                    IliasAdapter.upload(ubID, stud, ufn)
 
             if 'Matrikelnummer' in stud.keys() and exist(joinPath(f, '.points')):
                 with open(joinPath(f, '.points'), 'r') as pf:
