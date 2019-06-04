@@ -10,7 +10,7 @@ def post(url, *args, **kwargs):
     i = Config.get('tries',3)
     while i >= 0:
         r = SccSessions.post(url, *args, **kwargs)
-        if 'reloadpublic' in r.url:
+        if 'reloadpublic' in r.url or 'error.php' in r.url:
             SccSessions.getIliasSession()
             updateUrls()
         else:
@@ -22,7 +22,7 @@ def get(url, **kwargs):
     i = Config.get('tries',3)
     while i >= 0:
         r = SccSessions.get(url, **kwargs)
-        if 'reloadpublic' in r.url:
+        if 'reloadpublic' in r.url or 'error.php' in r.url:
             SccSessions.getIliasSession()
             updateUrls()
         else:
@@ -58,25 +58,9 @@ def updateUrls():
     downloadurl = lambda ubID, stud:'https://ilias.studium.kit.edu/ilias.php?ref_id=%s&vw=1&member_id=%s&ass_id=%s&cmd=downloadReturned&cmdClass=ilexsubmissionfilegui&baseClass=ilExerciseHandlerGUI' \
                                     % (Config.get('course'),str(stud['iliasID']), ubID) + cmdNodesuffix2
 
-
-#This url sometimes changes...
-def getList(**kwargs):
-    global listurl
-    i = Config.get('tries', 3)
-    while i >= 0:
-        r = get(listurl, **kwargs)
-        if not 'error.php' in r.url:
-            return r
-        r = get(courseurl)
-        content = r.text
-        content = content[content.index('id="tab_grades"'):]
-        content = content[content.index('href="'):]
-        listurl = baseurl + html.unescape(content[i:content.index('"', i + 1)])
-        i -= 1
-
 def getBlätter():
     asss = []
-    r = getList()
+    r = get(listurl)
     content = r.text
     i = content.index('id="ass_id"')
     content = content[i:content.index("</select>", i)]
@@ -89,7 +73,7 @@ def getBlätter():
     return asss
 
 def downloadAllesBlatt(ubID):
-    r = getList()
+    r = get(listurl)
     datadic = {'ass_id': int(ubID), 'cmd[downloadAll]': 'Alle Abgaben herunterladen', 'user_login': ''}
     content = r.text
     i = content.index('id="ilToolbar"')
@@ -152,7 +136,7 @@ def getStudentsOverView(f=file('data', 'ilias-overview.csv')):
     print('Collecting Student-Data from Ilias')
     with open(f, 'w') as f:
         f.write('iliasID,Nachname,Vorname,uID\n')
-        r = getList()
+        r = get('listurl')
         cont = r.text
         while 'tblrow' in cont:
             cont = cont[cont.index('tblrow'):]
