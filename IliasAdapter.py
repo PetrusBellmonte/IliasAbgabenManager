@@ -138,7 +138,7 @@ def getStudentsOverView(f=file('data', 'ilias-overview.csv')):
     print('Collecting Student-Data from Ilias')
     with open(f, 'w') as f:
         f.write('iliasID,Nachname,Vorname,uID\n')
-        r = get('listurl')
+        r = get(listurl)
         cont = r.text
         while 'tblrow' in cont:
             cont = cont[cont.index('tblrow'):]

@@ -75,7 +75,7 @@ def backUp():
         'csv':'CSV anfordern'
     }
     r = post(overviewUrl, stream=True, data=data)
-    out = file('data', 'downloads', 'overview ' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + '.csv')
+    out = file('data', 'downloads', 'overview ' + datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S") + '.csv')
     with open(out, 'wb') as handle:
         for chunk in r.iter_content(chunk_size=4096):
             if chunk:

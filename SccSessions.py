@@ -62,7 +62,7 @@ def getIliasSession():
     return __session
 
 def post(url, *args, **kwargs):
-    return __session.post(url, *args, **kwargs)
+    return __session.post(url, *args, verify=False, **kwargs)
 
 def get(url, **kwargs):
-    return __session.get(url, **kwargs)
+    return __session.get(url, verify=False, **kwargs)
