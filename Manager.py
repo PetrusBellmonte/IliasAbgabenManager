@@ -277,5 +277,41 @@ while True:
     if command == 'backUpGrades':
         MaAdapter.backUp()
 
+    if command.startswith('equalDistribution'): #Experimental
+        if ' ' not in command:
+            print('Incorrect command-format: "push <Task-ID> <Number of Groups> -d 1,4,10,0"');
+            continue
+        sc = command.split(' ')
+        ubID = sc[1]
+        nr = int(sc[2])
+        counter = [0]*nr
+        distribution = [[] for i in range(nr)]
+        studs = getStuds(ubID)
+        if '-d' in sc:
+            for i, n in enumerate(sc[sc.index('-d')+1].split(',')):
+                counter[i]=n
+        limit = (len(studs)+sum(counter))/nr
+        notDistrYet = []
+        for stud in studs:
+            if 'Tut' in stud.keys():
+                if counter[stud['Tut']]>=limit:
+                    notDistrYet.append(stud)
+                    counter
+                else:
+                    distribution[stud['Tut']].append(stud)
+                    counter[stud['Tut']]+=1
+        tut=0
+        while len(notDistrYet)!= 0:
+            if counter[tut]<limit:
+                distribution[tut].append(notDistrYet.pop())
+                counter[tut]+=1
+            else:
+                tut+=1
+        with open('Einteilung.txt','w') as f:
+            for tut in range(nr):
+                f.write('Tut '+str(tut))
+                f.write(','.join(stud['uID'] for stud in distribution[tut]))#TODO \n Fehlt hier?
+                
+            
     if command.startswith('load'):
         pass

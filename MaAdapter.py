@@ -12,7 +12,7 @@ overviewUrl = 'https://ma-vv.math.kit.edu/sso/overview'
 def post(url, *args, **kvargs):
     i= Config.get('tries',3)
     while i >=0:
-        r = SccSessions.post(url, *args, **kvargs)
+        r = SccSessions.post(url, *args, verify=False, **kvargs)
         if not 'idp.scc.kit.edu' in r.url:
             return r
         SccSessions.getMASession()
@@ -21,7 +21,7 @@ def post(url, *args, **kvargs):
 def get(url, *args, **kvargs):
     i= Config.get('tries',3)
     while i >=0:
-        r = SccSessions.get(url, *args, **kvargs)
+        r = SccSessions.get(url, *args, verify=False, **kvargs)
         if not 'idp.scc.kit.edu' in r.url:
             return r
         SccSessions.getMASession()
