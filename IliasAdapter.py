@@ -44,7 +44,7 @@ def updateUrls():
     content = r.text
     content = content[content.index('id="tab_grades"'):]
     content = content[content.index('href="')+len('href="'):]
-    listurl = baseurl + html.unescape(content[:content.index('"', 1)])
+    listurl = baseurl + html.unescape(content[:content.index('"', 1)])+'&exc_mem_trows=800'
     r = get(listurl)
     content = html.unescape(r.text)
     content = content[content.index('cmd=listFiles'):]
