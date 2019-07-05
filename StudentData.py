@@ -17,11 +17,11 @@ if exist(iliasPath):
 if exist(mathPath):
     with open(mathPath,'r',encoding='utf-8') as csvfile:
         reader = csv.DictReader(csvfile)
-        tut = 1
+        tut = -1
         for row in reader:
             element = dict(row)
             if not len(mathData)==0:
-                if element['Matrikelnummer']>mathData[-1]['Matrikelnummer']:
+                if element['Matrikelnummer']<mathData[-1]['Matrikelnummer']:
                     tut+=1
             element['Tut'] = tut
             mathData.append(element)

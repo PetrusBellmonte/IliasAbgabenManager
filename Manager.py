@@ -289,7 +289,7 @@ while True:
         studs = getStuds(ubID)
         if '-d' in sc:
             for i, n in enumerate(sc[sc.index('-d')+1].split(',')):
-                counter[i]=n
+                counter[i]=int(n)
         limit = (len(studs)+sum(counter))/nr
         notDistrYet = []
         for stud in studs:
@@ -309,9 +309,10 @@ while True:
                 tut+=1
         with open('Einteilung.txt','w') as f:
             for tut in range(nr):
-                f.write('Tut '+str(tut))
-                f.write(','.join(stud['uID'] for stud in distribution[tut]))#TODO \n Fehlt hier?
-                
+                print('Tut '+str(tut))
+                f.write('Tut '+str(tut)+'\n')
+                print(','.join(stud['uID'] for stud in distribution[tut]))
+                f.write(','.join(stud['uID'] for stud in distribution[tut])+'\n')
             
     if command.startswith('load'):
         pass
